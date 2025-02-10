@@ -1,0 +1,3 @@
+[submodule "ext/tb_client/tigerbeetle"]
+	path = ext/tb_client/tigerbeetle
+	url = https://github.com/tigerbeetle/tigerbeetle.git
