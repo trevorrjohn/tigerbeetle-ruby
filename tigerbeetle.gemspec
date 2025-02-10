@@ -15,4 +15,6 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["{lib}/**/*.*"] + %w(tigerbeetle.gemspec Gemfile LICENSE README.md)
 
   spec.add_dependency 'ffi'
+
+  spec.add_development_dependency 'rake'
 end

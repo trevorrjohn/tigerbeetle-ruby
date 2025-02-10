@@ -1,6 +1,9 @@
 .bundle/
 Gemfile.lock
 
+ext/tb_client/Makefile
+ext/tb_client/pkg/
+
 /coverage/
 /doc/
 /examples/vendor/
