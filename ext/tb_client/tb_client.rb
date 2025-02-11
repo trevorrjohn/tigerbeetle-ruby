@@ -36,6 +36,19 @@ module TBClient
                    :QUERY_ACCOUNTS,
                    :QUERY_TRANSFERS])
 
+  class UInt128 < FFI::Struct
+    layout low: :uint64, high: :uint64
+
+    def from(value)
+      self[:low] = value % 2**64
+      self[:high] = value >> 64
+    end
+
+    def to_i
+      self[:low] + (self[:high] << 64)
+    end
+  end
+
   class Packet < FFI::Struct
     layout :next, Packet.ptr,
            :user_data, :pointer,
@@ -48,6 +61,22 @@ module TBClient
            :batch_size, :uint32,
            :batch_allowed, :bool,
            :reserved, [:uint8, 7]
+  end
+
+  class Account < FFI::Struct
+    layout :id, UInt128,
+           :debits_pending, UInt128,
+           :debits_posted, UInt128,
+           :credits_pending, UInt128,
+           :credits_posted, UInt128,
+           :user_data_128, UInt128,
+           :user_data_64, :uint64,
+           :user_data_32, :uint32,
+           :reserved, :uint32,
+           :ledger, :uint32,
+           :code, :uint16,
+           :flags, :uint16,
+           :timestamp, :uint64
   end
 
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
