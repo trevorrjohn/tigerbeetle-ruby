@@ -3,8 +3,9 @@ require_relative '../../ext/tb_client/tb_client'
 require 'tigerbeetle/account'
 require 'tigerbeetle/account_balance'
 require 'tigerbeetle/account_filter'
-require 'tigerbeetle/transfer'
+require 'tigerbeetle/query_filter'
 require 'tigerbeetle/request'
+require 'tigerbeetle/transfer'
 
 module TigerBeetle
   class Client
@@ -57,6 +58,14 @@ module TigerBeetle
 
     def get_account_balances(filter)
       submit_request(:GET_ACCOUNT_BALANCES, [filter], TBClient::AccountFilter, TBClient::AccountBalance)
+    end
+
+    def query_accounts(filter)
+      submit_request(:QUERY_ACCOUNTS, [filter], TBClient::QueryFilter, TBClient::Account)
+    end
+
+    def query_transfers(filter)
+      submit_request(:QUERY_TRANSFERS, [filter], TBClient::QueryFilter, TBClient::Transfer)
     end
 
     private
