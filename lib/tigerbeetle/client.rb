@@ -1,5 +1,6 @@
 require 'ffi'
 require_relative '../../ext/tb_client/tb_client'
+require 'tigerbeetle/account'
 require 'tigerbeetle/request'
 
 module TigerBeetle
@@ -29,6 +30,10 @@ module TigerBeetle
       )
 
       raise "Error while initializing client: #{status}" unless status == :SUCCESS
+    end
+
+    def create_accounts(*accounts)
+      submit_request(:CREATE_ACCOUNTS, accounts, TBClient::Account, TBClient::CreateAccountsResult)
     end
 
     def lookup_accounts(*account_ids)
