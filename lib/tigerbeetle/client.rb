@@ -45,6 +45,10 @@ module TigerBeetle
       submit_request(:LOOKUP_ACCOUNTS, account_ids, TBClient::UInt128, TBClient::Account)
     end
 
+    def lookup_transfers(*transfer_ids)
+      submit_request(:LOOKUP_TRANSFERS, transfer_ids, TBClient::UInt128, TBClient::Transfer)
+    end
+
     private
 
     attr_reader :context, :client_ptr, :inflight_requests
