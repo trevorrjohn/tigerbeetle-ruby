@@ -1,6 +1,7 @@
 require 'ffi'
 require_relative '../../ext/tb_client/tb_client'
 require 'tigerbeetle/account'
+require 'tigerbeetle/transfer'
 require 'tigerbeetle/request'
 
 module TigerBeetle
@@ -34,6 +35,10 @@ module TigerBeetle
 
     def create_accounts(*accounts)
       submit_request(:CREATE_ACCOUNTS, accounts, TBClient::Account, TBClient::CreateAccountsResult)
+    end
+
+    def create_transfers(*transfers)
+      submit_request(:CREATE_TRANSFERS, transfers, TBClient::Transfer, TBClient::CreateTransfersResult)
     end
 
     def lookup_accounts(*account_ids)

@@ -6,7 +6,7 @@ module TigerBeetle
 
   Account = Struct.new(*ACCOUNT_PARAMS) do
     def initialize(
-      id:,
+      id: 0,
       debits_pending: 0,
       debits_posted: 0,
       credits_pending: 0,

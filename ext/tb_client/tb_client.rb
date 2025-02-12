@@ -65,6 +65,77 @@ module TBClient
                              :CODE_MUST_NOT_BE_ZERO, 14,
                              :IMPORTED_EVENT_TIMESTAMP_MUST_NOT_REGRESS, 26])
 
+  CreateTransferResult = enum(FFI::Type::UINT32, [
+                              :OK, 0,
+                              :LINKED_EVENT_FAILED, 1,
+                              :LINKED_EVENT_CHAIN_OPEN, 2,
+                              :IMPORTED_EVENT_EXPECTED, 56,
+                              :IMPORTED_EVENT_NOT_EXPECTED, 57,
+                              :TIMESTAMP_MUST_BE_ZERO, 3,
+                              :IMPORTED_EVENT_TIMESTAMP_OUT_OF_RANGE, 58,
+                              :IMPORTED_EVENT_TIMESTAMP_MUST_NOT_ADVANCE, 59,
+                              :RESERVED_FLAG, 4,
+                              :ID_MUST_NOT_BE_ZERO, 5,
+                              :ID_MUST_NOT_BE_INT_MAX, 6,
+                              :EXISTS_WITH_DIFFERENT_FLAGS, 36,
+                              :EXISTS_WITH_DIFFERENT_PENDING_ID, 40,
+                              :EXISTS_WITH_DIFFERENT_TIMEOUT, 44,
+                              :EXISTS_WITH_DIFFERENT_DEBIT_ACCOUNT_ID, 37,
+                              :EXISTS_WITH_DIFFERENT_CREDIT_ACCOUNT_ID, 38,
+                              :EXISTS_WITH_DIFFERENT_AMOUNT, 39,
+                              :EXISTS_WITH_DIFFERENT_USER_DATA_128, 41,
+                              :EXISTS_WITH_DIFFERENT_USER_DATA_64, 42,
+                              :EXISTS_WITH_DIFFERENT_USER_DATA_32, 43,
+                              :EXISTS_WITH_DIFFERENT_LEDGER, 67,
+                              :EXISTS_WITH_DIFFERENT_CODE, 45,
+                              :EXISTS, 46,
+                              :ID_ALREADY_FAILED, 68,
+                              :FLAGS_ARE_MUTUALLY_EXCLUSIVE, 7,
+                              :DEBIT_ACCOUNT_ID_MUST_NOT_BE_ZERO, 8,
+                              :DEBIT_ACCOUNT_ID_MUST_NOT_BE_INT_MAX, 9,
+                              :CREDIT_ACCOUNT_ID_MUST_NOT_BE_ZERO, 10,
+                              :CREDIT_ACCOUNT_ID_MUST_NOT_BE_INT_MAX, 11,
+                              :ACCOUNTS_MUST_BE_DIFFERENT, 12,
+                              :PENDING_ID_MUST_BE_ZERO, 13,
+                              :PENDING_ID_MUST_NOT_BE_ZERO, 14,
+                              :PENDING_ID_MUST_NOT_BE_INT_MAX, 15,
+                              :PENDING_ID_MUST_BE_DIFFERENT, 16,
+                              :TIMEOUT_RESERVED_FOR_PENDING_TRANSFER, 17,
+                              :CLOSING_TRANSFER_MUST_BE_PENDING, 64,
+                              :AMOUNT_MUST_NOT_BE_ZERO, 18,
+                              :LEDGER_MUST_NOT_BE_ZERO, 19,
+                              :CODE_MUST_NOT_BE_ZERO, 20,
+                              :DEBIT_ACCOUNT_NOT_FOUND, 21,
+                              :CREDIT_ACCOUNT_NOT_FOUND, 22,
+                              :ACCOUNTS_MUST_HAVE_THE_SAME_LEDGER, 23,
+                              :TRANSFER_MUST_HAVE_THE_SAME_LEDGER_AS_ACCOUNTS, 24,
+                              :PENDING_TRANSFER_NOT_FOUND, 25,
+                              :PENDING_TRANSFER_NOT_PENDING, 26,
+                              :PENDING_TRANSFER_HAS_DIFFERENT_DEBIT_ACCOUNT_ID, 27,
+                              :PENDING_TRANSFER_HAS_DIFFERENT_CREDIT_ACCOUNT_ID, 28,
+                              :PENDING_TRANSFER_HAS_DIFFERENT_LEDGER, 29,
+                              :PENDING_TRANSFER_HAS_DIFFERENT_CODE, 30,
+                              :EXCEEDS_PENDING_TRANSFER_AMOUNT, 31,
+                              :PENDING_TRANSFER_HAS_DIFFERENT_AMOUNT, 32,
+                              :PENDING_TRANSFER_ALREADY_POSTED, 33,
+                              :PENDING_TRANSFER_ALREADY_VOIDED, 34,
+                              :PENDING_TRANSFER_EXPIRED, 35,
+                              :IMPORTED_EVENT_TIMESTAMP_MUST_NOT_REGRESS, 60,
+                              :IMPORTED_EVENT_TIMESTAMP_MUST_POSTDATE_DEBIT_ACCOUNT, 61,
+                              :IMPORTED_EVENT_TIMESTAMP_MUST_POSTDATE_CREDIT_ACCOUNT, 62,
+                              :IMPORTED_EVENT_TIMEOUT_MUST_BE_ZERO, 63,
+                              :DEBIT_ACCOUNT_ALREADY_CLOSED, 65,
+                              :CREDIT_ACCOUNT_ALREADY_CLOSED, 66,
+                              :OVERFLOWS_DEBITS_PENDING, 47,
+                              :OVERFLOWS_CREDITS_PENDING, 48,
+                              :OVERFLOWS_DEBITS_POSTED, 49,
+                              :OVERFLOWS_CREDITS_POSTED, 50,
+                              :OVERFLOWS_DEBITS, 51,
+                              :OVERFLOWS_CREDITS, 52,
+                              :OVERFLOWS_TIMEOUT, 53,
+                              :EXCEEDS_CREDITS, 54,
+                              :EXCEEDS_DEBITS, 55])
+
   class UInt128 < FFI::Struct
     layout low: :uint64, high: :uint64
 
@@ -80,33 +151,33 @@ module TBClient
   end
 
   class Packet < FFI::Struct
-    layout :next, Packet.ptr,
-           :user_data, :pointer,
-           :operation, Operation,
-           :status, PacketStatus,
-           :data_size, :uint32,
-           :data, :pointer,
-           :batch_next, Packet.ptr,
-           :batch_tail, Packet.ptr,
-           :batch_size, :uint32,
-           :batch_allowed, :bool,
-           :reserved, [:uint8, 7]
+    layout next: Packet.ptr,
+           user_data: :pointer,
+           operation: Operation,
+           status: PacketStatus,
+           data_size: :uint32,
+           data: :pointer,
+           batch_next: Packet.ptr,
+           batch_tail: Packet.ptr,
+           batch_size: :uint32,
+           batch_allowed: :bool,
+           reserved: [:uint8, 7]
   end
 
   class Account < FFI::Struct
-    layout :id, UInt128,
-           :debits_pending, UInt128,
-           :debits_posted, UInt128,
-           :credits_pending, UInt128,
-           :credits_posted, UInt128,
-           :user_data_128, UInt128,
-           :user_data_64, :uint64,
-           :user_data_32, :uint32,
-           :reserved, :uint32,
-           :ledger, :uint32,
-           :code, :uint16,
-           :flags, :uint16,
-           :timestamp, :uint64
+    layout id: UInt128,
+           debits_pending: UInt128,
+           debits_posted: UInt128,
+           credits_pending: UInt128,
+           credits_posted: UInt128,
+           user_data_128: UInt128,
+           user_data_64: :uint64,
+           user_data_32: :uint32,
+           reserved: :uint32,
+           ledger: :uint32,
+           code: :uint16,
+           flags: :uint16,
+           timestamp: :uint64
 
     def from(value)
       self[:id] = UInt128.new.from(value.id)
@@ -126,9 +197,47 @@ module TBClient
     end
   end
 
+  class Transfer < FFI::Struct
+    layout  id: UInt128,
+            debit_account_id: UInt128,
+            credit_account_id: UInt128,
+            amount: UInt128,
+            pending_id: UInt128,
+            user_data_128: UInt128,
+            user_data_64: :uint64,
+            user_data_32: :uint32,
+            timeout: :uint32,
+            ledger: :uint32,
+            code: :uint16,
+            flags: :uint16,
+            timestamp: :uint64
+
+    def from(value)
+      self[:id] = UInt128.new.from(value.id)
+      self[:debit_account_id] = UInt128.new.from(value.debit_account_id)
+      self[:credit_account_id] = UInt128.new.from(value.credit_account_id)
+      self[:amount] = UInt128.new.from(value.amount)
+      self[:pending_id] = UInt128.new.from(value.pending_id)
+      self[:user_data_128] = UInt128.new.from(value.user_data_128)
+      self[:user_data_64] = value.user_data_64
+      self[:user_data_32] = value.user_data_32
+      self[:timeout] = value.timeout
+      self[:ledger] = value.ledger
+      self[:code] = value.code
+      self[:flags] = value.flags
+      self[:timestamp] = value.timestamp
+      self
+    end
+  end
+
   class CreateAccountsResult < FFI::Struct
     layout :index, :uint32,
            :result, CreateAccountResult
+  end
+
+  class CreateTransfersResult < FFI::Struct
+    layout :index, :uint32,
+           :result, CreateTransferResult
   end
 
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
