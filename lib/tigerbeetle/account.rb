@@ -1,7 +1,7 @@
 module TigerBeetle
   ACCOUNT_PARAMS = %i[
-    id debits_pending debits_posted credits_pending credits_posted user_data_128 user_data_64
-    user_data_32 reserved ledger code flags timestamp
+    id debits_pending debits_posted credits_pending credits_posted user_data_128
+    user_data_64 user_data_32 ledger code flags timestamp
   ]
 
   Account = Struct.new(*ACCOUNT_PARAMS) do
@@ -14,7 +14,6 @@ module TigerBeetle
       user_data_128: 0,
       user_data_64: 0,
       user_data_32: 0,
-      reserved: 0,
       ledger: 0,
       code: 0,
       flags: 0,
@@ -29,7 +28,6 @@ module TigerBeetle
         user_data_128,
         user_data_64,
         user_data_32,
-        reserved,
         ledger,
         code,
         flags,

@@ -188,7 +188,7 @@ module TBClient
       self[:user_data_128] = UInt128.new.from(value.user_data_128)
       self[:user_data_64] = value.user_data_64
       self[:user_data_32] = value.user_data_32
-      self[:reserved] = value.reserved
+      self[:reserved] = 0
       self[:ledger] = value.ledger
       self[:code] = value.code
       self[:flags] = value.flags
@@ -239,6 +239,34 @@ module TBClient
     layout :index, :uint32,
            :result, CreateTransferResult
   end
+
+  class AccountFilter < FFI::Struct
+    layout account_id: UInt128,
+           user_data_128: UInt128,
+           user_data_64: :uint64,
+           user_data_32: :uint32,
+           code: :uint16,
+           reserved: [:uint8, 58],
+           timestamp_min: :uint64,
+           timestamp_max: :uint64,
+           limit: :uint32,
+           flags: :uint32
+
+    def from(value)
+      self[:account_id] = UInt128.new.from(value.account_id)
+      self[:user_data_128] = UInt128.new.from(value.user_data_128)
+      self[:user_data_64] = value.user_data_64
+      self[:user_data_32] = value.user_data_32
+      self[:code] = value.code
+      self[:timestamp_min] = value.timestamp_min
+      self[:timestamp_max] = value.timestamp_max
+      self[:limit] = value.limit
+      self[:flags] = value.flags
+      self
+    end
+  end
+
+
 
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
 

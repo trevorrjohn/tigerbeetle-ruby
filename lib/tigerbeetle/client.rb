@@ -1,6 +1,7 @@
 require 'ffi'
 require_relative '../../ext/tb_client/tb_client'
 require 'tigerbeetle/account'
+require 'tigerbeetle/account_filter'
 require 'tigerbeetle/transfer'
 require 'tigerbeetle/request'
 
@@ -47,6 +48,10 @@ module TigerBeetle
 
     def lookup_transfers(*transfer_ids)
       submit_request(:LOOKUP_TRANSFERS, transfer_ids, TBClient::UInt128, TBClient::Transfer)
+    end
+
+    def get_account_transfers(filter)
+      submit_request(:GET_ACCOUNT_TRANSFERS, [filter], TBClient::AccountFilter, TBClient::Transfer)
     end
 
     private
