@@ -82,5 +82,5 @@ module TBClient
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
 
   attach_function :tb_client_init, [:pointer, :pointer, :string, :uint32, :uint, :on_completion], Status
-  attach_function :tb_client_submit, [:uint64, Packet.by_ref], :void
+  attach_function :tb_client_submit, [:pointer, Packet.by_ref], :void
 end

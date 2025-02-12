@@ -1,25 +1,30 @@
 require 'ffi'
 require_relative '../../ext/tb_client/tb_client'
+require 'tigerbeetle/request'
 
 module TigerBeetle
   class Client
+    # TODO: Make this counter atomic
+    @counter = 0
+
+    def self.next_id
+      @counter += 1
+    end
+
     def initialize(cluster_id = 0, address = '3000')
       @inflight_requests = {}
-      @context = rand(0..1000)
       # Keep a pointer to prevent proc from getting GCed
       @callback = Proc.new { |*args| callback(*args) }
-      @client_ptr = FFI::MemoryPointer.new(:uint64, 1)
-      cluster_id_ptr = FFI::MemoryPointer.new(:uint64, 2)
-
-      # TODO: Add proper uint128 serialization
-      cluster_id_ptr.put_array_of_uint64(0, [cluster_id, 0])
+      @client_id = self.class.next_id
+      @client_ptr = FFI::MemoryPointer.new(:pointer, 1) # **void
+      cluster_id_ptr = serialize([cluster_id], TBClient::UInt128)
 
       status = TBClient.tb_client_init(
         @client_ptr,
         cluster_id_ptr,
         address,
         address.length,
-        @context,
+        @client_id,
         &@callback
       )
 
@@ -27,47 +32,27 @@ module TigerBeetle
     end
 
     def lookup_accounts(*account_ids)
-      queue = Queue.new
-
-      submit_request(
-        :LOOKUP_ACCOUNTS,
-        account_ids,
-        TBClient::UInt128,
-        TBClient::Account
-      ) do |response|
-        queue << response
-      end
-
-      # block until the request is processed and return it
-      queue.pop
+      submit_request(:LOOKUP_ACCOUNTS, account_ids, TBClient::UInt128, TBClient::Account)
     end
 
     private
 
     attr_reader :context, :client_ptr, :inflight_requests
 
-    def callback(context, client, packet, timestamp, result_ptr, result_len)
-      p 'CALLBACK RECEIVED!'
-      p context
-      p client
-      p packet
-      p timestamp
-      p result_ptr
-      p result_len
-
-      p inflight_requests[packet[:user_data].read_uint64]
-      inflight_requests[packet[:user_data].read_uint64][1].call(result_ptr)
+    def callback(client_id, client, packet, timestamp, result_ptr, result_len)
+      request_id = packet[:user_data].read_uint64
+      request = inflight_requests[request_id]
+      result = deserialize(result_ptr, request.response_type, result_len)
+      request.block.call(result)
     end
 
-    def submit_request(operation, request, request_type, response_type, &block)
+    def submit_request(operation, request, request_type, response_type)
+      queue = Queue.new
+      request_id = self.class.next_id
       user_data_ptr = FFI::MemoryPointer.new(:uint64, 1)
-      user_data_ptr.write_uint64(123)
+      user_data_ptr.write_uint64(request_id)
 
-      data_ptr = FFI::MemoryPointer.new(request_type, request.length, true)
-      request.each_with_index do |value, i|
-        instance = request_type.new(data_ptr[i]) # initialize new type over the new memory
-        instance.from(value) # write values into the memory
-      end
+      data_ptr = serialize(request, request_type)
 
       packet = TBClient::Packet.new
       packet[:user_data] = user_data_ptr
@@ -76,9 +61,34 @@ module TigerBeetle
       packet[:data_size] = data_ptr.size
       packet[:data] = data_ptr
 
-      inflight_requests[123] = [packet, block, response_type]
+      # TODO: Allow async invocation by passing your own block
+      block = proc { |response| queue << response }
+      inflight_requests[request_id] = Request.new(packet, response_type, block)
 
-      TBClient.tb_client_submit(client_ptr.read(:uint64), packet)
+      TBClient.tb_client_submit(client_ptr.read(:pointer), packet)
+
+      # block until the client return a response
+      queue.pop
+    end
+
+    def serialize(data, type)
+      data_ptr = FFI::MemoryPointer.new(type, data.length, true)
+      data.each_with_index do |value, i|
+        # initialize type at the memory address and write value over it
+        type.new(data_ptr[i]).from(value)
+      end
+
+      data_ptr
+    end
+
+    def deserialize(ptr, type, length)
+      # copy the memory own to retain the data after tb_client has freed its memory
+      own_ptr = FFI::MemoryPointer.new(:char, type.size * length)
+      own_ptr.put_bytes(0, ptr.read_bytes(type.size * length))
+
+      Array.new(length / type.size) do |i|
+        type.new(own_ptr + i * type.size)
+      end
     end
   end
 end
