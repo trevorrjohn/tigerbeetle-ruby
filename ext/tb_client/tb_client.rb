@@ -266,7 +266,23 @@ module TBClient
     end
   end
 
+  class AccountBalance < FFI::Struct
+    layout debits_pending: UInt128,
+           debits_posted: UInt128,
+           credits_pending: UInt128,
+           credits_posted: UInt128,
+           timestamp: :uint64,
+           reserved: [:uint8, 56]
 
+    def from(value)
+      self[:debits_pending] = UInt128.new.from(value.debits_pending)
+      self[:debits_posted] = UInt128.new.from(value.debits_posted)
+      self[:credits_pending] = UInt128.new.from(value.credits_pending)
+      self[:credits_posted] = UInt128.new.from(value.credits_posted)
+      self[:timestamp] = value.timestamp
+      self
+    end
+  end
 
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
 
