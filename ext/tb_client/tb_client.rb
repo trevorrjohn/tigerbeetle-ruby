@@ -1,10 +1,10 @@
 require 'ffi'
+require_relative './shared_lib'
 
 module TBClient
   extend FFI::Library
 
-  # TODO: Load appropriate shared lib for the platform
-  ffi_lib File.expand_path('./pkg/aarch64-macos/libtb_client.dylib', __dir__)
+  ffi_lib SharedLib.path
 
   Status = enum(FFI::Type::UINT8, [
                   :SUCCESS, 0,
