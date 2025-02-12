@@ -136,6 +136,31 @@ module TBClient
                               :EXCEEDS_CREDITS, 54,
                               :EXCEEDS_DEBITS, 55])
 
+  AccountFlags = bitmask(FFI::Type::UINT16, [
+    :LINKED,
+    :DEBITS_MUST_NOT_EXCEED_CREDITS,
+    :CREDITS_MUST_NOT_EXCEED_DEBITS,
+    :HISTORY,
+    :IMPORTED,
+    :CLOSED]
+  )
+
+  TransferFlags = bitmask(FFI::Type::UINT16, [
+    :LINKED,
+    :PENDING,
+    :POST_PENDING_TRANSFER,
+    :VOID_PENDING_TRANSFER,
+    :BALANCING_DEBIT,
+    :BALANCING_CREDIT,
+    :CLOSING_DEBIT,
+    :CLOSING_CREDIT,
+    :IMPORTED]
+  )
+
+  AccountFilterFlags = bitmask(FFI::Type::UINT32, [:DEBITS, :CREDITS, :REVERSED])
+
+  QueryFilterFlags = bitmask(FFI::Type::UINT32, [:REVERSED])
+
   class UInt128 < FFI::Struct
     layout low: :uint64, high: :uint64
 
@@ -176,7 +201,7 @@ module TBClient
            reserved: :uint32,
            ledger: :uint32,
            code: :uint16,
-           flags: :uint16,
+           flags: AccountFlags,
            timestamp: :uint64
 
     def from(value)
@@ -209,7 +234,7 @@ module TBClient
             timeout: :uint32,
             ledger: :uint32,
             code: :uint16,
-            flags: :uint16,
+            flags: TransferFlags,
             timestamp: :uint64
 
     def from(value)
@@ -250,7 +275,7 @@ module TBClient
            timestamp_min: :uint64,
            timestamp_max: :uint64,
            limit: :uint32,
-           flags: :uint32
+           flags: AccountFilterFlags
 
     def from(value)
       self[:account_id] = UInt128.new.from(value.account_id)
@@ -276,7 +301,7 @@ module TBClient
            timestamp_min: :uint64,
            timestamp_max: :uint64,
            limit: :uint32,
-           flags: :uint32
+           flags: QueryFilterFlags
 
     def from(value)
       self[:user_data_128] = UInt128.new.from(value.user_data_128)

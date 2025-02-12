@@ -16,7 +16,7 @@ module TigerBeetle
       user_data_32: 0,
       ledger: 0,
       code: 0,
-      flags: 0,
+      flags: [],
       timestamp: 0
     )
       super(

@@ -13,7 +13,7 @@ module TigerBeetle
       timestamp_min: 0,
       timestamp_max: 0,
       limit: 0,
-      flags: 0
+      flags: []
     )
       super(
         account_id,
