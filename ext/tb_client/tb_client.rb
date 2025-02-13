@@ -1,5 +1,5 @@
 require 'ffi'
-require_relative './shared_lib'
+require 'tb_client/shared_lib'
 
 module TBClient
   extend FFI::Library
