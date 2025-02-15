@@ -22,6 +22,8 @@ module SharedLib
     when 'linux'
       prefix = 'lib'
       system = 'linux'
+      # TODO: Find a way to determine libc version in Ruby
+      linux_libc = '-gnu.2.27'
       suffix = '.so'
     when 'windows'
       system = 'windows'

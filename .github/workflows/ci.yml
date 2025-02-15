@@ -30,7 +30,7 @@ jobs:
       run: bundle exec rake compile
 
     - name: Print compiled extensions
-      run: ls -la ext/tb_client/pkg
+      run: tree ext/tb_client/pkg
 
     - name: Download TigerBeetle server
       run: curl -Lo tigerbeetle.zip https://linux.tigerbeetle.com && unzip tigerbeetle.zip && ./tigerbeetle version
