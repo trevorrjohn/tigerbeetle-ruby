@@ -7,6 +7,8 @@ describe 'Integration tests for a sync client' do
   let(:code) { 10 }
   let(:id) { TigerBeetle::ID.generate }
 
+  after { client.deinit }
+
   describe 'create_accounts' do
     it 'creates a new account' do
       response = client.create_accounts(TigerBeetle::Account.new(id:, ledger:, code:))

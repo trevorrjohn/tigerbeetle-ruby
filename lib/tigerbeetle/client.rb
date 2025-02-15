@@ -68,6 +68,11 @@ module TigerBeetle
       submit_request(:QUERY_TRANSFERS, [filter], TBClient::QueryFilter, TBClient::Transfer)
     end
 
+    def deinit
+      TBClient.tb_client_deinit(client_ptr.read(:pointer))
+      @client_ptr = nil
+    end
+
     private
 
     attr_reader :context, :client_ptr, :inflight_requests

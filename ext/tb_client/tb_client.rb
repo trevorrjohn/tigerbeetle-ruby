@@ -339,4 +339,5 @@ module TBClient
 
   attach_function :tb_client_init, [:pointer, :pointer, :string, :uint32, :uint, :on_completion], Status
   attach_function :tb_client_submit, [:pointer, Packet.by_ref], :void
+  attach_function :tb_client_deinit, [:pointer], :void
 end
