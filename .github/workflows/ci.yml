@@ -1,0 +1,35 @@
+name: CI
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repo
+      uses: actions/checkout@v4
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.3.4'
+        bundler-cache: true
+
+    - name: Set up Zig
+      uses: mlugg/setup-zig@v1
+
+    - name: Compile native extension
+      run: bundle exec rake compile
+
+    - name: Download TigerBeetle server
+      run: curl -Lo tigerbeetle.zip https://linux.tigerbeetle.com && unzip tigerbeetle.zip && ./tigerbeetle version
+
+    - name: Create TigerBeetle DB file
+      run: ./tigerbeetle format --cluster=0 --replica=0 --replica-count=1 --development db.tigerbeetle
+
+    - name: Start TigerBeetle server
+      run: ./tigerbeetle start --addresses=3000 --development db.tigerbeetle &
+
+    - name: Run tests
+      run: bundle exec rspec
