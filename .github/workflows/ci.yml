@@ -23,8 +23,14 @@ jobs:
     - name: Set up Zig
       uses: mlugg/setup-zig@v1
 
+    - name: Print glibc version
+      run: ldd --version
+
     - name: Compile native extension
       run: bundle exec rake compile
+
+    - name: Print compiled extensions
+      run: ls -la ext/tb_client/pkg
 
     - name: Download TigerBeetle server
       run: curl -Lo tigerbeetle.zip https://linux.tigerbeetle.com && unzip tigerbeetle.zip && ./tigerbeetle version
