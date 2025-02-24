@@ -38,12 +38,14 @@ module SharedLib
     private
 
     def detect_libc
-      if system('ldd --version 2>&1 | grep -q "musl"')
+      ldd_output = `ldd --version 2>&1 | head -n 1`.downcase
+
+      if ldd_output.include?('musl')
         '-musl'
-      elsif system('ldd --version 2>&1 | grep -q "GNU"')
+      elsif ldd_output.include?('gnu') || ldd_output.include?('glibc')
         '-gnu.2.27'
       else
-        raise 'Unsupported libc'
+        raise "Unsupported libc: #{ldd_output}"
       end
     end
   end
