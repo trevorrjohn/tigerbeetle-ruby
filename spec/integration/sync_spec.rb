@@ -1,13 +1,14 @@
-require 'tigerbeetle/client'
-require 'tigerbeetle/id'
+require 'tigerbeetle'
 
 describe 'Integration tests for a sync client' do
-  let(:client) { TigerBeetle::Client.new } # assume TB is running on localhost:3000
+  let(:client) { @client }
   let(:ledger) { 111 }
   let(:code) { 10 }
   let(:id) { TigerBeetle::ID.generate }
 
-  after { client.deinit }
+  # assume TB is running on localhost:3000
+  before(:all) { @client = TigerBeetle.connect }
+  after(:all) { @client.deinit }
 
   describe 'create_accounts' do
     it 'creates a new account' do
