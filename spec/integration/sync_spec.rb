@@ -75,26 +75,27 @@ describe 'Integration tests for a sync client' do
   end
 
   describe 'lookup_transfers' do
-    let(:ids) { Array.new(4) { TigerBeetle::ID.generate } }
+    let(:account_ids) { Array.new(2) { TigerBeetle::ID.generate } }
+    let(:transfer_ids) { Array.new(2) { TigerBeetle::ID.generate } }
 
     before do
       client.create_accounts(
-        TigerBeetle::Account.new(id: ids[0], ledger:, code:),
-        TigerBeetle::Account.new(id: ids[1], ledger:, code:)
+        TigerBeetle::Account.new(id: account_ids[0], ledger:, code:),
+        TigerBeetle::Account.new(id: account_ids[1], ledger:, code:)
       )
       client.create_transfers(
         TigerBeetle::Transfer.new(
-          id: ids[2],
-          debit_account_id: ids[0],
-          credit_account_id: ids[1],
+          id: transfer_ids[0],
+          debit_account_id: account_ids[0],
+          credit_account_id: account_ids[1],
           amount: 111,
           ledger:,
           code:
         ),
         TigerBeetle::Transfer.new(
-          id: ids[3],
-          debit_account_id: ids[1],
-          credit_account_id: ids[0],
+          id: transfer_ids[1],
+          debit_account_id: account_ids[1],
+          credit_account_id: account_ids[0],
           amount: 222,
           ledger:,
           code:
@@ -103,18 +104,18 @@ describe 'Integration tests for a sync client' do
     end
 
     it 'returns transfer details' do
-      response = client.lookup_transfers(ids[2], ids[3])
+      response = client.lookup_transfers(transfer_ids[0], transfer_ids[1])
       expect(response.length).to eq(2)
 
       transfer_1, transfer_2 = response
-      expect(transfer_1[:id].to_i).to eq(ids[2])
-      expect(transfer_1[:debit_account_id].to_i).to eq(ids[0])
-      expect(transfer_1[:credit_account_id].to_i).to eq(ids[1])
+      expect(transfer_1[:id].to_i).to eq(transfer_ids[0])
+      expect(transfer_1[:debit_account_id].to_i).to eq(account_ids[0])
+      expect(transfer_1[:credit_account_id].to_i).to eq(account_ids[1])
       expect(transfer_1[:amount].to_i).to eq(111)
 
-      expect(transfer_2[:id].to_i).to eq(ids[3])
-      expect(transfer_2[:debit_account_id].to_i).to eq(ids[1])
-      expect(transfer_2[:credit_account_id].to_i).to eq(ids[0])
+      expect(transfer_2[:id].to_i).to eq(transfer_ids[1])
+      expect(transfer_2[:debit_account_id].to_i).to eq(account_ids[1])
+      expect(transfer_2[:credit_account_id].to_i).to eq(account_ids[0])
       expect(transfer_2[:amount].to_i).to eq(222)
     end
   end
