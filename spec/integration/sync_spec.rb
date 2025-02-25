@@ -121,11 +121,100 @@ describe 'Integration tests for a sync client' do
   end
 
   describe 'get_account_transfers' do
+    let(:account_ids) { Array.new(3) { TigerBeetle::ID.generate } }
+    let(:transfer_ids) { Array.new(3) { TigerBeetle::ID.generate } }
 
+    before do
+      client.create_accounts(
+        TigerBeetle::Account.new(id: account_ids[0], ledger:, code:),
+        TigerBeetle::Account.new(id: account_ids[1], ledger:, code:),
+        TigerBeetle::Account.new(id: account_ids[2], ledger:, code:)
+      )
+      client.create_transfers(
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[0],
+          debit_account_id: account_ids[0],
+          credit_account_id: account_ids[1],
+          amount: 111,
+          ledger:,
+          code:
+        ),
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[1],
+          debit_account_id: account_ids[1],
+          credit_account_id: account_ids[2],
+          amount: 222,
+          ledger:,
+          code:
+        ),
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[2],
+          debit_account_id: account_ids[2],
+          credit_account_id: account_ids[0],
+          amount: 333,
+          ledger:,
+          code:
+        )
+      )
+    end
+
+    it 'returns account transfers' do
+      filter = TigerBeetle::AccountFilter.new(
+        account_id: account_ids[0],
+        limit: 10,
+        flags: [:DEBITS, :CREDITS]
+      )
+      response = client.get_account_transfers(filter)
+      expect(response.length).to eq(2)
+
+      transfer_1, transfer_2 = response
+      expect(transfer_1[:id].to_i).to eq(transfer_ids[0])
+      expect(transfer_1[:debit_account_id].to_i).to eq(account_ids[0])
+      expect(transfer_1[:credit_account_id].to_i).to eq(account_ids[1])
+      expect(transfer_1[:amount].to_i).to eq(111)
+
+      expect(transfer_2[:id].to_i).to eq(transfer_ids[2])
+      expect(transfer_2[:debit_account_id].to_i).to eq(account_ids[2])
+      expect(transfer_2[:credit_account_id].to_i).to eq(account_ids[0])
+      expect(transfer_2[:amount].to_i).to eq(333)
+    end
   end
 
   describe 'get_account_balances' do
+    let(:account_ids) { Array.new(2) { TigerBeetle::ID.generate } }
 
+    before do
+      client.create_accounts(
+        TigerBeetle::Account.new(id: account_ids[0], ledger:, code:, flags: [:HISTORY]),
+        TigerBeetle::Account.new(id: account_ids[1], ledger:, code:, flags: [:HISTORY]),
+      )
+      client.create_transfers(
+        TigerBeetle::Transfer.new(
+          id: id,
+          debit_account_id: account_ids[0],
+          credit_account_id: account_ids[1],
+          amount: 111,
+          ledger:,
+          code:
+        )
+      )
+    end
+
+    it 'returns account balances' do
+      filter = TigerBeetle::AccountFilter.new(
+        account_id: account_ids[0],
+        limit: 10,
+        flags: [:DEBITS, :CREDITS]
+      )
+      response = client.get_account_balances(filter)
+      expect(response.length).to eq(1)
+
+      balance = response[0]
+      expect(balance[:debits_pending].to_i).to eq(0)
+      expect(balance[:debits_posted].to_i).to eq(111)
+      expect(balance[:credits_pending].to_i).to eq(0)
+      expect(balance[:credits_posted].to_i).to eq(0)
+    end
   end
 
   describe 'query_accounts' do
