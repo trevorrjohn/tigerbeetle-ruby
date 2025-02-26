@@ -218,10 +218,75 @@ describe 'Integration tests for a sync client' do
   end
 
   describe 'query_accounts' do
+    let(:account_ids) { Array.new(3) { TigerBeetle::ID.generate } }
 
+    before do
+      client.create_accounts(
+        TigerBeetle::Account.new(id: account_ids[0], ledger:, code:, user_data_128: id),
+        TigerBeetle::Account.new(id: account_ids[1], ledger:, code:, user_data_128: id),
+        TigerBeetle::Account.new(id: account_ids[2], ledger:, code:, user_data_128: id)
+      )
+    end
+
+    it 'returns found accounts' do
+      response = client.query_accounts(TigerBeetle::QueryFilter.new(user_data_128: id, limit: 10))
+      expect(response.length).to eq(3)
+
+      account_1, account_2, account_3 = response
+      expect(account_1[:id].to_i).to eq(account_ids[0])
+      expect(account_2[:id].to_i).to eq(account_ids[1])
+      expect(account_3[:id].to_i).to eq(account_ids[2])
+    end
   end
 
   describe 'query_transfers' do
+    let(:account_ids) { Array.new(2) { TigerBeetle::ID.generate } }
+    let(:transfer_ids) { Array.new(3) { TigerBeetle::ID.generate } }
 
+    before do
+      client.create_accounts(
+        TigerBeetle::Account.new(id: account_ids[0], ledger:, code:),
+        TigerBeetle::Account.new(id: account_ids[1], ledger:, code:),
+      )
+      client.create_transfers(
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[0],
+          debit_account_id: account_ids[0],
+          credit_account_id: account_ids[1],
+          amount: 111,
+          ledger:,
+          code:,
+          user_data_128: id
+        ),
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[1],
+          debit_account_id: account_ids[1],
+          credit_account_id: account_ids[0],
+          amount: 222,
+          ledger:,
+          code:,
+          user_data_128: id
+        ),
+        TigerBeetle::Transfer.new(
+          id: transfer_ids[2],
+          debit_account_id: account_ids[0],
+          credit_account_id: account_ids[1],
+          amount: 333,
+          ledger:,
+          code:,
+          user_data_128: id
+        )
+      )
+    end
+
+    it 'returns found transfers' do
+      response = client.query_transfers(TigerBeetle::QueryFilter.new(user_data_128: id, limit: 10))
+      expect(response.length).to eq(3)
+
+      transfer_1, transfer_2, transfer_3 = response
+      expect(transfer_1[:id].to_i).to eq(transfer_ids[0])
+      expect(transfer_2[:id].to_i).to eq(transfer_ids[1])
+      expect(transfer_3[:id].to_i).to eq(transfer_ids[2])
+    end
   end
 end
