@@ -17,13 +17,31 @@ describe 'Integration tests for a sync client' do
       expect(response).to be_empty
     end
 
-    it 'creates an existing account' do
+    it 'fails to create a duplicate account' do
       account = TigerBeetle::Account.new(id:, ledger:, code:)
 
       client.create_accounts(account)
       response = client.create_accounts(account)
 
       expect(response[0][:result]).to eq(:EXISTS)
+    end
+
+    it 'creates accounts asynchronously' do
+      ids = Array.new(10) { TigerBeetle::ID.generate }
+
+      queue = Queue.new
+      ids.each do |id|
+        response = client.create_accounts(TigerBeetle::Account.new(id:, ledger:, code:)) do |_|
+          queue << id
+        end
+
+        expect(response).to eq(nil)
+      end
+
+      completed = []
+      10.times { completed << queue.pop }
+
+      expect(completed).to match_array(ids)
     end
   end
 

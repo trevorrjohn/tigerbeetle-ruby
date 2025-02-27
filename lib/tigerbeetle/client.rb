@@ -36,36 +36,84 @@ module TigerBeetle
       raise "Error while initializing client: #{status}" unless status == :SUCCESS
     end
 
-    def create_accounts(*accounts)
-      submit_request(:CREATE_ACCOUNTS, accounts, TBClient::Account, TBClient::CreateAccountsResult)
+    def create_accounts(*accounts, &block)
+      submit_request(
+        :CREATE_ACCOUNTS,
+        accounts,
+        TBClient::Account,
+        TBClient::CreateAccountsResult,
+        &block
+      )
     end
 
-    def create_transfers(*transfers)
-      submit_request(:CREATE_TRANSFERS, transfers, TBClient::Transfer, TBClient::CreateTransfersResult)
+    def create_transfers(*transfers, &block)
+      submit_request(
+        :CREATE_TRANSFERS,
+        transfers,
+        TBClient::Transfer,
+        TBClient::CreateTransfersResult,
+        &block
+      )
     end
 
-    def lookup_accounts(*account_ids)
-      submit_request(:LOOKUP_ACCOUNTS, account_ids, TBClient::UInt128, TBClient::Account)
+    def lookup_accounts(*account_ids, &block)
+      submit_request(
+        :LOOKUP_ACCOUNTS,
+        account_ids,
+        TBClient::UInt128,
+        TBClient::Account,
+        &block
+      )
     end
 
-    def lookup_transfers(*transfer_ids)
-      submit_request(:LOOKUP_TRANSFERS, transfer_ids, TBClient::UInt128, TBClient::Transfer)
+    def lookup_transfers(*transfer_ids, &block)
+      submit_request(
+        :LOOKUP_TRANSFERS,
+        transfer_ids,
+        TBClient::UInt128,
+        TBClient::Transfer,
+        &block
+      )
     end
 
-    def get_account_transfers(filter)
-      submit_request(:GET_ACCOUNT_TRANSFERS, [filter], TBClient::AccountFilter, TBClient::Transfer)
+    def get_account_transfers(filter, &block)
+      submit_request(
+        :GET_ACCOUNT_TRANSFERS,
+        [filter],
+        TBClient::AccountFilter,
+        TBClient::Transfer,
+        &block
+      )
     end
 
-    def get_account_balances(filter)
-      submit_request(:GET_ACCOUNT_BALANCES, [filter], TBClient::AccountFilter, TBClient::AccountBalance)
+    def get_account_balances(filter, &block)
+      submit_request(
+        :GET_ACCOUNT_BALANCES,
+        [filter],
+        TBClient::AccountFilter,
+        TBClient::AccountBalance,
+        &block
+      )
     end
 
-    def query_accounts(filter)
-      submit_request(:QUERY_ACCOUNTS, [filter], TBClient::QueryFilter, TBClient::Account)
+    def query_accounts(filter, &block)
+      submit_request(
+        :QUERY_ACCOUNTS,
+        [filter],
+        TBClient::QueryFilter,
+        TBClient::Account,
+        &block
+      )
     end
 
-    def query_transfers(filter)
-      submit_request(:QUERY_TRANSFERS, [filter], TBClient::QueryFilter, TBClient::Transfer)
+    def query_transfers(filter, &block)
+      submit_request(
+        :QUERY_TRANSFERS,
+        [filter],
+        TBClient::QueryFilter,
+        TBClient::Transfer,
+        &block
+      )
     end
 
     def deinit
@@ -84,8 +132,7 @@ module TigerBeetle
       request.block.call(result)
     end
 
-    def submit_request(operation, request, request_type, response_type)
-      queue = Queue.new
+    def submit_request(operation, request, request_type, response_type, &block)
       request_id = self.class.next_id
       user_data_ptr = FFI::MemoryPointer.new(:uint64, 1)
       user_data_ptr.write_uint64(request_id)
@@ -99,14 +146,19 @@ module TigerBeetle
       packet[:data_size] = data_ptr.size
       packet[:data] = data_ptr
 
-      # TODO: Allow async invocation by passing your own block
-      block = proc { |response| queue << response }
-      inflight_requests[request_id] = Request.new(packet, response_type, block)
+      queue = Queue.new
+      inflight_requests[request_id] = Request.new(packet, response_type) do |response|
+        if block
+          block.call(response)
+        else
+          queue << response
+        end
+      end
 
       TBClient.tb_client_submit(client_ptr.read(:pointer), packet)
 
       # block until the client return a response
-      queue.pop
+      queue.pop unless block
     end
 
     def serialize(data, type)
