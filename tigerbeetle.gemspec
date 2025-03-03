@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/antstorm/tigerbeetle-ruby'
   spec.license       = 'Apache-2.0'
 
-  spec.require_paths = ['lib', 'ext']
+  spec.require_paths = ['lib']
   spec.files         = Dir["{lib}/**/*.*"] + %w(tigerbeetle.gemspec Gemfile LICENSE README.md)
 
   spec.add_dependency 'ffi'

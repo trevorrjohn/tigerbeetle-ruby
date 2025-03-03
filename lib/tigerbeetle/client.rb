@@ -1,5 +1,5 @@
 require 'ffi'
-require 'tb_client/tb_client'
+require 'tb_client'
 require 'tigerbeetle/account'
 require 'tigerbeetle/account_balance'
 require 'tigerbeetle/account_filter'
