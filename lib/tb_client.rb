@@ -162,7 +162,8 @@ module TBClient
   QueryFilterFlags = bitmask(FFI::Type::UINT32, [:REVERSED])
 
   class UInt128 < FFI::Struct
-    layout low: :uint64, high: :uint64
+    layout low: :uint64,
+           high: :uint64
 
     def from(value)
       self[:low] = value % 2**64
@@ -223,19 +224,19 @@ module TBClient
   end
 
   class Transfer < FFI::Struct
-    layout  id: UInt128,
-            debit_account_id: UInt128,
-            credit_account_id: UInt128,
-            amount: UInt128,
-            pending_id: UInt128,
-            user_data_128: UInt128,
-            user_data_64: :uint64,
-            user_data_32: :uint32,
-            timeout: :uint32,
-            ledger: :uint32,
-            code: :uint16,
-            flags: TransferFlags,
-            timestamp: :uint64
+    layout id: UInt128,
+           debit_account_id: UInt128,
+           credit_account_id: UInt128,
+           amount: UInt128,
+           pending_id: UInt128,
+           user_data_128: UInt128,
+           user_data_64: :uint64,
+           user_data_32: :uint32,
+           timeout: :uint32,
+           ledger: :uint32,
+           code: :uint16,
+           flags: TransferFlags,
+           timestamp: :uint64
 
     def from(value)
       self[:id] = UInt128.new.from(value.id)
@@ -256,13 +257,13 @@ module TBClient
   end
 
   class CreateAccountsResult < FFI::Struct
-    layout :index, :uint32,
-           :result, CreateAccountResult
+    layout index: :uint32,
+           result: CreateAccountResult
   end
 
   class CreateTransfersResult < FFI::Struct
-    layout :index, :uint32,
-           :result, CreateTransferResult
+    layout index: :uint32,
+           result: CreateTransferResult
   end
 
   class AccountFilter < FFI::Struct
