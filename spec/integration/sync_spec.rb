@@ -23,7 +23,7 @@ describe 'Integration tests for a sync client' do
       client.create_accounts(account)
       response = client.create_accounts(account)
 
-      expect(response[0][:result]).to eq(:EXISTS)
+      expect(response[0]).to eq([0, :EXISTS])
     end
 
     it 'creates accounts asynchronously' do
@@ -85,10 +85,10 @@ describe 'Integration tests for a sync client' do
       response = client.lookup_accounts(id)
 
       expect(response.length).to eq(1)
-      expect(response[0]).to be_a(TBClient::Account)
-      expect(response[0][:id].to_i).to eq(id)
-      expect(response[0][:ledger]).to eq(ledger)
-      expect(response[0][:code]).to eq(code)
+      expect(response[0]).to be_a(TigerBeetle::Account)
+      expect(response[0].id).to eq(id)
+      expect(response[0].ledger).to eq(ledger)
+      expect(response[0].code).to eq(code)
     end
   end
 

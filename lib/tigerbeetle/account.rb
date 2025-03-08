@@ -17,7 +17,7 @@ module TigerBeetle
       ledger: 0,
       code: 0,
       flags: [],
-      timestamp: 0
+      timestamp: nil
     )
       super(
         id,

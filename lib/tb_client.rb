@@ -164,16 +164,6 @@ module TBClient
   class UInt128 < FFI::Struct
     layout low: :uint64,
            high: :uint64
-
-    def from(value)
-      self[:low] = value % 2**64
-      self[:high] = value >> 64
-      self # allow for single line init + fill
-    end
-
-    def to_i
-      self[:low] + (self[:high] << 64)
-    end
   end
 
   class Packet < FFI::Struct
@@ -204,23 +194,6 @@ module TBClient
            code: :uint16,
            flags: AccountFlags,
            timestamp: :uint64
-
-    def from(value)
-      self[:id] = UInt128.new.from(value.id)
-      self[:debits_pending] = UInt128.new.from(value.debits_pending)
-      self[:debits_posted] = UInt128.new.from(value.debits_posted)
-      self[:credits_pending] = UInt128.new.from(value.credits_pending)
-      self[:credits_posted] = UInt128.new.from(value.credits_posted)
-      self[:user_data_128] = UInt128.new.from(value.user_data_128)
-      self[:user_data_64] = value.user_data_64
-      self[:user_data_32] = value.user_data_32
-      self[:reserved] = 0
-      self[:ledger] = value.ledger
-      self[:code] = value.code
-      self[:flags] = value.flags
-      self[:timestamp] = value.timestamp
-      self
-    end
   end
 
   class Transfer < FFI::Struct
@@ -237,23 +210,6 @@ module TBClient
            code: :uint16,
            flags: TransferFlags,
            timestamp: :uint64
-
-    def from(value)
-      self[:id] = UInt128.new.from(value.id)
-      self[:debit_account_id] = UInt128.new.from(value.debit_account_id)
-      self[:credit_account_id] = UInt128.new.from(value.credit_account_id)
-      self[:amount] = UInt128.new.from(value.amount)
-      self[:pending_id] = UInt128.new.from(value.pending_id)
-      self[:user_data_128] = UInt128.new.from(value.user_data_128)
-      self[:user_data_64] = value.user_data_64
-      self[:user_data_32] = value.user_data_32
-      self[:timeout] = value.timeout
-      self[:ledger] = value.ledger
-      self[:code] = value.code
-      self[:flags] = value.flags
-      self[:timestamp] = value.timestamp
-      self
-    end
   end
 
   class CreateAccountsResult < FFI::Struct
@@ -277,19 +233,6 @@ module TBClient
            timestamp_max: :uint64,
            limit: :uint32,
            flags: AccountFilterFlags
-
-    def from(value)
-      self[:account_id] = UInt128.new.from(value.account_id)
-      self[:user_data_128] = UInt128.new.from(value.user_data_128)
-      self[:user_data_64] = value.user_data_64
-      self[:user_data_32] = value.user_data_32
-      self[:code] = value.code
-      self[:timestamp_min] = value.timestamp_min
-      self[:timestamp_max] = value.timestamp_max
-      self[:limit] = value.limit
-      self[:flags] = value.flags
-      self
-    end
   end
 
   class QueryFilter < FFI::Struct
@@ -303,19 +246,6 @@ module TBClient
            timestamp_max: :uint64,
            limit: :uint32,
            flags: QueryFilterFlags
-
-    def from(value)
-      self[:user_data_128] = UInt128.new.from(value.user_data_128)
-      self[:user_data_64] = value.user_data_64
-      self[:user_data_32] = value.user_data_32
-      self[:ledger] = value.ledger
-      self[:code] = value.code
-      self[:timestamp_min] = value.timestamp_min
-      self[:timestamp_max] = value.timestamp_max
-      self[:limit] = value.limit
-      self[:flags] = value.flags
-      self
-    end
   end
 
   class AccountBalance < FFI::Struct
@@ -325,15 +255,6 @@ module TBClient
            credits_posted: UInt128,
            timestamp: :uint64,
            reserved: [:uint8, 56]
-
-    def from(value)
-      self[:debits_pending] = UInt128.new.from(value.debits_pending)
-      self[:debits_posted] = UInt128.new.from(value.debits_posted)
-      self[:credits_pending] = UInt128.new.from(value.credits_pending)
-      self[:credits_posted] = UInt128.new.from(value.credits_posted)
-      self[:timestamp] = value.timestamp
-      self
-    end
   end
 
   callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
