@@ -1,16 +1,17 @@
 require 'tb_client'
 require 'tigerbeetle/account'
+require 'tigerbeetle/converters/base'
 require 'tigerbeetle/converters/time'
 require 'tigerbeetle/converters/uint_128'
 
 module TigerBeetle
   module Converters
-    module Account
+    class Account < Base
       def self.native_type
         TBClient::Account
       end
 
-      def self.from_native(ptr)
+      def from_native(ptr)
         c_value = TBClient::Account.new(ptr)
 
         TigerBeetle::Account.new(
@@ -29,7 +30,18 @@ module TigerBeetle
         )
       end
 
-      def self.to_native(ptr, value)
+      def to_native(ptr, value)
+        validate_uint!(:id, 128, value.id)
+        validate_uint!(:debits_pending, 128, value.debits_pending)
+        validate_uint!(:debits_posted, 128, value.debits_posted)
+        validate_uint!(:credits_pending, 128, value.credits_pending)
+        validate_uint!(:credits_posted, 128, value.credits_posted)
+        validate_uint!(:user_data_128, 128, value.user_data_128)
+        validate_uint!(:user_data_64, 64, value.user_data_64)
+        validate_uint!(:user_data_32, 32, value.user_data_32)
+        validate_uint!(:ledger, 32, value.ledger)
+        validate_uint!(:code, 16, value.code)
+
         TBClient::Account.new(ptr).tap do |result|
           Converters::UInt128.to_native(result[:id].to_ptr, value.id)
           Converters::UInt128.to_native(result[:debits_pending].to_ptr, value.debits_pending)

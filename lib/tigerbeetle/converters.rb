@@ -7,3 +7,6 @@ require 'tigerbeetle/converters/query_filter'
 require 'tigerbeetle/converters/time'
 require 'tigerbeetle/converters/transfer'
 require 'tigerbeetle/converters/uint_128'
+
+module Converters
+end

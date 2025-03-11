@@ -5,28 +5,16 @@ require 'tigerbeetle/converters/uint_128'
 
 module TigerBeetle
   module Converters
-    module AccountFilter
+    class AccountFilter < Base
       def self.native_type
         TBClient::AccountFilter
       end
 
-      def self.from_native(ptr)
-        c_value = TBClient::AccountFilter.new(ptr)
-
-        TigerBeetle::AccountFilter.new(
-          account_id: Converters::UInt128.from_native(c_value[:account_id].to_ptr),
-          user_data_128: Converters::UInt128.from_native(c_value[:user_data_128].to_ptr),
-          user_data_64: c_value[:user_data_64],
-          user_data_32: c_value[:user_data_32],
-          code: c_value[:code],
-          timestamp_min: Converters::Time.from_native(ptr + c_value.offset_of(:timestamp_min)),
-          timestamp_max: Converters::Time.from_native(ptr + c_value.offset_of(:timestamp_max)),
-          limit: c_value[:limit],
-          flags: c_value[:flags]
-        )
+      def from_native(ptr)
+        raise 'Unexpected conversion of a native type to AccountFilter'
       end
 
-      def self.to_native(ptr, value)
+      def to_native(ptr, value)
         TBClient::AccountFilter.new(ptr).tap do |result|
           Converters::UInt128.to_native(result[:account_id].to_ptr, value.account_id)
           Converters::UInt128.to_native(result[:user_data_128].to_ptr, value.user_data_128)

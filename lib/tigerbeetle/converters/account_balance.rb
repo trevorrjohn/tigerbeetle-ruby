@@ -1,16 +1,17 @@
 require 'tb_client'
 require 'tigerbeetle/account_balance'
+require 'tigerbeetle/converters/base'
 require 'tigerbeetle/converters/time'
 require 'tigerbeetle/converters/uint_128'
 
 module TigerBeetle
   module Converters
-    module AccountBalance
+    class AccountBalance < Base
       def self.native_type
         TBClient::AccountBalance
       end
 
-      def self.from_native(ptr)
+      def from_native(ptr)
         c_value = TBClient::AccountBalance.new(ptr)
 
         TigerBeetle::AccountBalance.new(
@@ -22,14 +23,8 @@ module TigerBeetle
         )
       end
 
-      def self.to_native(ptr, value)
-        TBClient::AccountBalance.new(ptr).tap do |result|
-          Converters::UInt128.to_native(result[:debits_pending].to_ptr, value.debits_pending)
-          Converters::UInt128.to_native(result[:debits_posted].to_ptr, value.debits_posted)
-          Converters::UInt128.to_native(result[:credits_pending].to_ptr, value.credits_pending)
-          Converters::UInt128.to_native(result[:credits_posted].to_ptr, value.credits_posted)
-          Converters::Time.to_native(ptr + result.offset_of(:timestamp), value.timestamp || 0)
-        end
+      def to_native(ptr, value)
+        raise 'Unexpected conversion of AccountBalance to native type'
       end
     end
   end

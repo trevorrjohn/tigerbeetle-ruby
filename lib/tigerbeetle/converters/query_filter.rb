@@ -1,32 +1,21 @@
 require 'tb_client'
 require 'tigerbeetle/query_filter'
+require 'tigerbeetle/converters/base'
 require 'tigerbeetle/converters/time'
 require 'tigerbeetle/converters/uint_128'
 
 module TigerBeetle
   module Converters
-    module QueryFilter
+    class QueryFilter < Base
       def self.native_type
         TBClient::QueryFilter
       end
 
-      def self.from_native(ptr)
-        c_value = TBClient::Account.new(ptr)
-
-        TigerBeetle::QueryFilter.new(
-          user_data_128: Converters::UInt128.from_native(c_value[:user_data_128].to_ptr),
-          user_data_64: c_value[:user_data_64],
-          user_data_32: c_value[:user_data_32],
-          ledger: c_value[:ledger],
-          code: c_value[:code],
-          timestamp_min: Converters::Time.from_native(ptr + c_value.offset_of(:timestamp_min)),
-          timestamp_max: Converters::Time.from_native(ptr + c_value.offset_of(:timestamp_max)),
-          limit: c_value[:limit],
-          flags: c_value[:flags]
-        )
+      def from_native(ptr)
+        raise 'Unexpected conversion of a native type to QueryFilter'
       end
 
-      def self.to_native(ptr, value)
+      def to_native(ptr, value)
         TBClient::QueryFilter.new(ptr).tap do |result|
           Converters::UInt128.to_native(result[:user_data_128].to_ptr, value.user_data_128)
           result[:user_data_64] = value.user_data_64

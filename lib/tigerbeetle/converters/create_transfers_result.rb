@@ -1,19 +1,20 @@
 require 'tb_client'
+require 'tigerbeetle/converters/base'
 
 module TigerBeetle
   module Converters
-    module CreateTransfersResult
+    class CreateTransfersResult < Base
       def self.native_type
         TBClient::CreateTransfersResult
       end
 
-      def self.from_native(ptr)
+      def from_native(ptr)
         c_value = TBClient::CreateTransfersResult.new(ptr)
         [c_value[:index], c_value[:result]]
       end
 
-      def self.to_native(ptr, value)
-        raise 'unexpected invocation'
+      def to_native(ptr, value)
+        raise 'Unexpected conversion of CreateTransfersResult to a native type'
       end
     end
   end
