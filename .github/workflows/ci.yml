@@ -21,9 +21,7 @@ jobs:
         bundler-cache: true
 
     - name: Set up Zig
-      uses: mlugg/setup-zig@v1
-      with:
-        version: 0.13.0
+      run: cd ext/tb_client/tigerbeetle && ./zig/download.sh
 
     - name: Print glibc version
       run: ldd --version
