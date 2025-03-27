@@ -6,14 +6,18 @@ module TBClient
 
   ffi_lib SharedLib.path
 
-  Status = enum(FFI::Type::UINT8, [
-                  :SUCCESS, 0,
-                  :UNEXPECTED,
-                  :OUT_OF_MEMORY,
-                  :ADDRESS_INVALID,
-                  :ADDRESS_LIMIT_EXCEEDED,
-                  :SYSTEM_RESOURCES,
-                  :NETWORK_SUBSYSTEM])
+  InitStatus = enum(FFI::Type::UINT8, [
+                    :SUCCESS, 0,
+                    :UNEXPECTED,
+                    :OUT_OF_MEMORY,
+                    :ADDRESS_INVALID,
+                    :ADDRESS_LIMIT_EXCEEDED,
+                    :SYSTEM_RESOURCES,
+                    :NETWORK_SUBSYSTEM])
+
+  ClientStatus = enum(FFI::Type::UINT8, [
+                      :OK, 0,
+                      :INVALID])
 
   PacketStatus = enum(FFI::Type::UINT8, [
                       :OK, 0,
@@ -161,23 +165,23 @@ module TBClient
 
   QueryFilterFlags = bitmask(FFI::Type::UINT32, [:REVERSED])
 
+  class Client < FFI::Struct
+    layout opaque: [:uint64, 4]
+  end
+
   class UInt128 < FFI::Struct
     layout low: :uint64,
            high: :uint64
   end
 
   class Packet < FFI::Struct
-    layout next: Packet.ptr,
-           user_data: :pointer,
+    layout user_data: :pointer,
+           data: :pointer,
+           data_size: :uint32,
+           user_tag: :uint16,
            operation: Operation,
            status: PacketStatus,
-           data_size: :uint32,
-           data: :pointer,
-           batch_next: Packet.ptr,
-           batch_tail: Packet.ptr,
-           batch_size: :uint32,
-           batch_allowed: :bool,
-           reserved: [:uint8, 7]
+           opaque: [:uint8, 32]
   end
 
   class Account < FFI::Struct
@@ -257,9 +261,9 @@ module TBClient
            reserved: [:uint8, 56]
   end
 
-  callback :on_completion, [:uint, :uint64, Packet.by_ref, :uint64, :pointer, :uint32], :void
+  callback :on_completion, [:uint, Packet.by_ref, :uint64, :pointer, :uint32], :void
 
-  attach_function :tb_client_init, [:pointer, :pointer, :string, :uint32, :uint, :on_completion], Status
-  attach_function :tb_client_submit, [:pointer, Packet.by_ref], :void
-  attach_function :tb_client_deinit, [:pointer], :void
+  attach_function :tb_client_init, [Client.by_ref, :pointer, :string, :uint32, :uint, :on_completion], InitStatus
+  attach_function :tb_client_submit, [Client.by_ref, Packet.by_ref], ClientStatus
+  attach_function :tb_client_deinit, [Client.by_ref], ClientStatus
 end

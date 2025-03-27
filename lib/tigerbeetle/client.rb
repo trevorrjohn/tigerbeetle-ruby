@@ -22,11 +22,13 @@ module TigerBeetle
       # Keep a pointer to prevent proc from getting GCed
       @callback = Proc.new { |*args| callback(*args) }
       @client_id = self.class.next_id
-      @client_ptr = FFI::MemoryPointer.new(:pointer, 1) # **void
+      @client = TBClient::Client.new
+
+      # FFI::MemoryPointer.new(:pointer, 1) # **void
       cluster_id_ptr = serialize([cluster_id], Converters::UInt128)
 
       status = TBClient.tb_client_init(
-        @client_ptr,
+        @client,
         cluster_id_ptr,
         address,
         address.length,
@@ -118,15 +120,15 @@ module TigerBeetle
     end
 
     def deinit
-      TBClient.tb_client_deinit(client_ptr.read(:pointer))
-      @client_ptr = nil
+      TBClient.tb_client_deinit(client)
+      @client = nil
     end
 
     private
 
-    attr_reader :context, :client_ptr, :inflight_requests
+    attr_reader :context, :client, :inflight_requests
 
-    def callback(client_id, client, packet, timestamp, result_ptr, result_len)
+    def callback(client_id, packet, timestamp, result_ptr, result_len)
       request_id = packet[:user_data].read_uint64
       request = inflight_requests[request_id]
       result = deserialize(result_ptr, request.converter, result_len)
@@ -156,7 +158,7 @@ module TigerBeetle
         end
       end
 
-      TBClient.tb_client_submit(client_ptr.read(:pointer), packet)
+      status = TBClient.tb_client_submit(client, packet)
 
       # block until the client return a response
       queue.pop unless block
