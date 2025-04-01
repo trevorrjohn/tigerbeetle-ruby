@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'Apache-2.0'
 
   spec.require_paths = ['lib']
+  spec.extensions    = ['ext/tb_client/extconf.rb']
   spec.files         = Dir["{lib}/**/*.*"] + %w(tigerbeetle.gemspec Gemfile LICENSE README.md)
 
   spec.add_dependency 'ffi'
