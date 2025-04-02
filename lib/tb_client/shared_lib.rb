@@ -19,7 +19,7 @@ module TBClient
           end
 
         case os
-        when 'darwin', 'darwin22'
+        when /darwin/
           prefix = 'lib'
           system = 'macos'
           suffix = '.dylib'
