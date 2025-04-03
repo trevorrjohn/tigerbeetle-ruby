@@ -4,3 +4,9 @@ task :compile do
     sh 'make'
   end
 end
+
+task package: [:compile] do
+  cd 'ext/tb_client' do
+    sh 'tar -czf pkg.tar.gz -C ./pkg .'
+  end
+end

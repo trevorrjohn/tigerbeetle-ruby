@@ -3,6 +3,7 @@ Gemfile.lock
 
 ext/tb_client/Makefile
 ext/tb_client/pkg/
+mkmf.log
 
 /coverage/
 /doc/
