@@ -9,16 +9,33 @@ makefile = ''
 
 if find_executable('zig') && File.exist?('./tigerbeetle/build.zig')
   makefile = <<~MFILE
+    .PHONY = all install clean
+    \n\n
     all:
+    \techo "Compiling native TB client from the source"
     \tzig version
     \tcd ./tigerbeetle && zig build clients:c -Dconfig-release=#{client_version} -Dconfig-release-client-min=#{client_version}
+    \n\n
+    install:
     \tcp -rf ./tigerbeetle/src/clients/c/lib ./pkg
+    \n\n
+    clean:
+    \trm -rf ./pkg/
+    \trm -rf ./tigerbeetle/src/clients/c/lib
   MFILE
 elsif File.exist?("./#{tar_package}")
   makefile = <<~MFILE
+    .PHONY = install clean
+    \n\n
     all:
+    \techo "Installing precompiled native TB client"
+    \n\n
+    install:
     \tmkdir pkg
     \ttar -xzf #{tar_package} -C ./pkg
+    \n\n
+    clean:
+    \trm -rf ./pkg/
   MFILE
 end
 
