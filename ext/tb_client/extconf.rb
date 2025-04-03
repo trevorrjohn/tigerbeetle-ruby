@@ -28,11 +28,11 @@ elsif File.exist?("./#{tar_package}")
     .PHONY = install clean
     \n\n
     all:
-    \techo "Installing precompiled native TB client"
-    \n\n
-    install:
     \tmkdir pkg
     \ttar -xzf #{tar_package} -C ./pkg
+    \n\n
+    install:
+    \techo "Installing precompiled native TB client"
     \n\n
     clean:
     \trm -rf ./pkg/
