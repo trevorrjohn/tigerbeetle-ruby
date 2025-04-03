@@ -30,7 +30,7 @@ elsif File.exist?("./#{tar_package}")
     \techo "Installing precompiled native TB client"
     \n\n
     clean:
-    \trm #{tar_package}
+    \techo "Nothing to clean"
   MFILE
 end
 
