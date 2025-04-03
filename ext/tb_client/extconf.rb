@@ -18,7 +18,6 @@ if find_executable('zig') && File.exist?('./tigerbeetle/build.zig')
     \tcp -rf ./tigerbeetle/src/clients/c/lib ./pkg
     \n\n
     clean:
-    \trm -rf ./pkg/
     \trm -rf ./tigerbeetle/src/clients/c/lib
   MFILE
 elsif File.exist?("./#{tar_package}")
@@ -31,7 +30,7 @@ elsif File.exist?("./#{tar_package}")
     \techo "Installing precompiled native TB client"
     \n\n
     clean:
-    \trm -rf ./pkg/
+    \trm #{tar_package}
   MFILE
 end
 
