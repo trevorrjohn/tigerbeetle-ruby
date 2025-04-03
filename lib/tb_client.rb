@@ -31,14 +31,15 @@ module TBClient
 
   Operation = enum(FFI::Type::UINT8, [
                    :PULSE, 128,
-                   :CREATE_ACCOUNTS,
-                   :CREATE_TRANSFERS,
-                   :LOOKUP_ACCOUNTS,
-                   :LOOKUP_TRANSFERS,
-                   :GET_ACCOUNT_TRANSFERS,
-                   :GET_ACCOUNT_BALANCES,
-                   :QUERY_ACCOUNTS,
-                   :QUERY_TRANSFERS])
+                   :CREATE_ACCOUNTS, 129,
+                   :CREATE_TRANSFERS, 130,
+                   :LOOKUP_ACCOUNTS, 131,
+                   :LOOKUP_TRANSFERS, 132,
+                   :GET_ACCOUNT_TRANSFERS, 133,
+                   :GET_ACCOUNT_BALANCES, 134,
+                   :QUERY_ACCOUNTS, 135,
+                   :QUERY_TRANSFERS, 136,
+                   :GET_EVENTS, 137])
 
   CreateAccountResult = enum(FFI::Type::UINT32, [
                              :OK, 0,
@@ -106,7 +107,6 @@ module TBClient
                               :PENDING_ID_MUST_BE_DIFFERENT, 16,
                               :TIMEOUT_RESERVED_FOR_PENDING_TRANSFER, 17,
                               :CLOSING_TRANSFER_MUST_BE_PENDING, 64,
-                              :AMOUNT_MUST_NOT_BE_ZERO, 18,
                               :LEDGER_MUST_NOT_BE_ZERO, 19,
                               :CODE_MUST_NOT_BE_ZERO, 20,
                               :DEBIT_ACCOUNT_NOT_FOUND, 21,

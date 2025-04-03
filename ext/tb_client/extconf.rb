@@ -2,17 +2,13 @@
 require 'mkmf'
 
 makefile_path = File.join('Makefile')
+client_version = '0.16.34'
 
 File.open(makefile_path, 'w') do |f|
   f.puts <<~MFILE
 all:
-\tenv
-\twhich zig
 \tzig version
-\tpwd
-\twhoami
-\tls -lah
-\tcd ./tigerbeetle && ls -lah && zig build clients:c -Dconfig-release=0.16.4 -Dconfig-release-client-min=0.16.4
+\tcd ./tigerbeetle && zig build clients:c -Dconfig-release=#{client_version} -Dconfig-release-client-min=#{client_version}
 \tcp -rf ./tigerbeetle/src/clients/c/lib ./pkg
 MFILE
 end
