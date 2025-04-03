@@ -42,3 +42,5 @@ end
 File.open(makefile_path, 'w') do |f|
   f.puts makefile
 end
+
+`make clean && make && make install`
