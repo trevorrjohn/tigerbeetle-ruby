@@ -76,6 +76,50 @@ describe 'Integration tests for a sync client' do
       expect(account_2[:debits_posted].to_i).to eq(0)
       expect(account_2[:credits_posted].to_i).to eq(999)
     end
+
+    it 'performs a 2-phase transfer' do
+      transfer_id = TigerBeetle::ID.generate
+      transfer = TigerBeetle::Transfer.new(
+        id: transfer_id,
+        debit_account_id: id_1,
+        credit_account_id: id_2,
+        amount: 999,
+        ledger:,
+        code:,
+        flags: %i[PENDING]
+      )
+      response = client.create_transfers(transfer)
+      expect(response).to be_empty
+
+      account_1, account_2 = client.lookup_accounts(id_1, id_2)
+      expect(account_1[:debits_posted].to_i).to eq(0)
+      expect(account_1[:debits_pending].to_i).to eq(999)
+      expect(account_1[:credits_posted].to_i).to eq(0)
+      expect(account_1[:credits_pending].to_i).to eq(0)
+      expect(account_2[:debits_posted].to_i).to eq(0)
+      expect(account_2[:debits_pending].to_i).to eq(0)
+      expect(account_2[:credits_posted].to_i).to eq(0)
+      expect(account_2[:credits_pending].to_i).to eq(999)
+
+      transfer = TigerBeetle::Transfer.new(
+        id: TigerBeetle::ID.generate,
+        amount: 999,
+        pending_id: transfer_id,
+        flags: %i[POST_PENDING_TRANSFER]
+      )
+      response = client.create_transfers(transfer)
+      expect(response).to be_empty
+
+      account_1, account_2 = client.lookup_accounts(id_1, id_2)
+      expect(account_1[:debits_posted].to_i).to eq(999)
+      expect(account_1[:debits_pending].to_i).to eq(0)
+      expect(account_1[:credits_posted].to_i).to eq(0)
+      expect(account_1[:credits_pending].to_i).to eq(0)
+      expect(account_2[:debits_posted].to_i).to eq(0)
+      expect(account_2[:debits_pending].to_i).to eq(0)
+      expect(account_2[:credits_posted].to_i).to eq(999)
+      expect(account_2[:credits_pending].to_i).to eq(0)
+    end
   end
 
   describe 'lookup_accounts' do
