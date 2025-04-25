@@ -7,6 +7,7 @@ tar_package = 'pkg.tar.gz'
 
 makefile = ''
 
+puts ENV.each { |k, v| puts "#{k}=#{v}" }
 if find_executable('zig') && File.exist?('./tigerbeetle/build.zig')
   makefile = <<~MFILE
     all:
