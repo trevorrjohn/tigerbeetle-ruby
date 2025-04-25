@@ -12,7 +12,7 @@ if find_executable('zig') && File.exist?('./tigerbeetle/build.zig')
     all:
     \techo "Compiling native TB client from the source"
     \tzig version
-    \tcd ./tigerbeetle && zig build clients:c -Dconfig-release=#{client_version} -Dconfig-release-client-min=#{client_version}
+    \tunset -v DESTDIR && cd ./tigerbeetle && zig build clients:c -Dconfig-release=#{client_version} -Dconfig-release-client-min=#{client_version}
     \n\n
     install:
     \tcp -rf ./tigerbeetle/src/clients/c/lib ./pkg
