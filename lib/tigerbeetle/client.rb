@@ -159,6 +159,7 @@ module TigerBeetle
       end
 
       status = TBClient.tb_client_submit(client, packet)
+      raise "Unable to submit request: #{status}" unless status == :OK
 
       # block until the client return a response
       queue.pop unless block

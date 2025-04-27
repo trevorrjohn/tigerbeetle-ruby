@@ -31,15 +31,15 @@ module TBClient
 
   Operation = enum(FFI::Type::UINT8, [
                    :PULSE, 128,
-                   :CREATE_ACCOUNTS, 129,
-                   :CREATE_TRANSFERS, 130,
-                   :LOOKUP_ACCOUNTS, 131,
-                   :LOOKUP_TRANSFERS, 132,
-                   :GET_ACCOUNT_TRANSFERS, 133,
-                   :GET_ACCOUNT_BALANCES, 134,
-                   :QUERY_ACCOUNTS, 135,
-                   :QUERY_TRANSFERS, 136,
-                   :GET_EVENTS, 137])
+                   :GET_EVENTS, 137,
+                   :CREATE_ACCOUNTS, 138,
+                   :CREATE_TRANSFERS, 139,
+                   :LOOKUP_ACCOUNTS, 140,
+                   :LOOKUP_TRANSFERS, 141,
+                   :GET_ACCOUNT_TRANSFERS, 142,
+                   :GET_ACCOUNT_BALANCES, 143,
+                   :QUERY_ACCOUNTS, 144,
+                   :QUERY_TRANSFERS, 145])
 
   CreateAccountResult = enum(FFI::Type::UINT32, [
                              :OK, 0,

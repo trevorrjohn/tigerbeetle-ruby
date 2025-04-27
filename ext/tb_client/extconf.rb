@@ -2,7 +2,7 @@
 require 'mkmf'
 
 makefile_path = File.join('Makefile')
-client_version = '0.16.34'
+client_version = '0.16.37'
 tar_package = 'pkg.tar.gz'
 
 makefile = ''
@@ -23,7 +23,7 @@ if find_executable('zig') && File.exist?('./tigerbeetle/build.zig')
 elsif File.exist?("./#{tar_package}")
   makefile = <<~MFILE
     all:
-    \tmkdir pkg
+    \tmkdir -p pkg
     \ttar -xzf #{tar_package} -C ./pkg
     \n\n
     install:
