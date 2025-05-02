@@ -29,6 +29,11 @@ module TBClient
                       :INVALID_OPERATION,
                       :INVALID_DATA_SIZE])
 
+  RegisterLogCallbackStatus = enum(FFI::Type::UINT8, [
+                                   :SUCCESS, 0,
+                                   :ALREADY_REGISTERED,
+                                   :NOT_REGISTERED])
+
   Operation = enum(FFI::Type::UINT8, [
                    :PULSE, 128,
                    :GET_EVENTS, 137,
@@ -139,6 +144,12 @@ module TBClient
                               :OVERFLOWS_TIMEOUT, 53,
                               :EXCEEDS_CREDITS, 54,
                               :EXCEEDS_DEBITS, 55])
+
+  LogLevel = enum(FFI::Type::UINT8, [
+                  :ERR, 0,
+                  :WARN,
+                  :INFO,
+                  :DEBUG])
 
   AccountFlags = bitmask(FFI::Type::UINT16, [
     :LINKED,
@@ -262,8 +273,10 @@ module TBClient
   end
 
   callback :on_completion, [:uint, Packet.by_ref, :uint64, :pointer, :uint32], :void
+  callback :log_handler, [LogLevel, :pointer, :uint32], :void
 
   attach_function :tb_client_init, [Client.by_ref, :pointer, :string, :uint32, :uint, :on_completion], InitStatus
   attach_function :tb_client_submit, [Client.by_ref, Packet.by_ref], ClientStatus
   attach_function :tb_client_deinit, [Client.by_ref], ClientStatus
+  attach_function :tb_client_register_log_callback, [:log_handler, :bool], RegisterLogCallbackStatus
 end

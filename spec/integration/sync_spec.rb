@@ -1,4 +1,5 @@
 require 'tigerbeetle'
+require 'logger'
 
 describe 'Integration tests for a sync client' do
   let(:client) { @client }
@@ -349,6 +350,21 @@ describe 'Integration tests for a sync client' do
       expect(transfer_1[:id].to_i).to eq(transfer_ids[0])
       expect(transfer_2[:id].to_i).to eq(transfer_ids[1])
       expect(transfer_3[:id].to_i).to eq(transfer_ids[2])
+    end
+  end
+
+  describe 'with logger' do
+    let(:logger) { instance_double(::Logger) }
+
+    after { client.logger = nil }
+
+    it 'registers the logger to receive log messages' do
+      allow(logger).to receive(:debug)
+
+      client.logger = logger
+      client.lookup_accounts(id)
+
+      expect(logger).to have_received(:debug).at_least(1).with(an_instance_of(String))
     end
   end
 end

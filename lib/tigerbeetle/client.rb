@@ -39,6 +39,14 @@ module TigerBeetle
       raise "Error while initializing client: #{status}" unless status == :SUCCESS
     end
 
+    def logger=(logger)
+      @logger = logger
+      @log_callback = @logger ? Proc.new { |*args| log_callback(*args) } : nil
+
+      status = TBClient.tb_client_register_log_callback(@log_callback, true)
+      raise "Error registering a logger: #{status}" unless status == :SUCCESS
+    end
+
     def create_accounts(*accounts, &block)
       submit_request(
         :CREATE_ACCOUNTS,
@@ -126,7 +134,17 @@ module TigerBeetle
 
     private
 
-    attr_reader :context, :client, :inflight_requests
+    attr_reader :context, :client, :inflight_requests, :logger
+
+    def log_callback(level, ptr, length)
+      message = ptr.read_string(length).force_encoding('UTF-8')
+      case level
+      when :ERR then logger.error(message)
+      when :WARN then logger.warn(message)
+      when :INFO then logger.info(message)
+      when :DEBUG then logger.debug(message)
+      end
+    end
 
     def callback(client_id, packet, timestamp, result_ptr, result_len)
       request_id = packet[:user_data].read_uint64
@@ -136,6 +154,8 @@ module TigerBeetle
     end
 
     def submit_request(operation, request, request_converter, response_converter, &block)
+      raise 'Client is not connected' unless client
+
       request_id = self.class.next_id
       user_data_ptr = FFI::MemoryPointer.new(:uint64, 1)
       user_data_ptr.write_uint64(request_id)
