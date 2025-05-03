@@ -35,8 +35,10 @@ module TigerBeetle
         @client_id,
         &@callback
       )
-
       raise "Error while initializing client: #{status}" unless status == :SUCCESS
+
+      # Make sure to deinitialize all clients when the process terminates
+      at_exit { deinit }
     end
 
     def logger=(logger)
@@ -128,6 +130,8 @@ module TigerBeetle
     end
 
     def deinit
+      return unless client
+
       TBClient.tb_client_deinit(client)
       @client = nil
     end

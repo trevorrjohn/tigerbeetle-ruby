@@ -9,7 +9,6 @@ describe 'Integration tests for a sync client' do
 
   # assume TB is running on localhost:3000
   before(:all) { @client = TigerBeetle.connect }
-  after(:all) { @client.deinit }
 
   describe 'create_accounts' do
     it 'creates a new account' do
