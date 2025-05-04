@@ -5,14 +5,14 @@ module TigerBeetle
 
   AccountFilter = Struct.new(*ACCOUNT_FILTER_PARAMS) do
     def initialize(
-      account_id: 0,
+      account_id:,
       user_data_128: 0,
       user_data_64: 0,
       user_data_32: 0,
       code: 0,
       timestamp_min: 0,
       timestamp_max: 0,
-      limit: 0,
+      limit:,
       flags: []
     )
       super(

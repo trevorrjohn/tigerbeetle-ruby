@@ -6,7 +6,7 @@ module TigerBeetle
 
   Transfer = Struct.new(*TRANSFER_PARAMS) do
     def initialize(
-      id: 0,
+      id:,
       debit_account_id: 0,
       credit_account_id: 0,
       amount: 0,

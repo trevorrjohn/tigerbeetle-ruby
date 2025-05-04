@@ -12,7 +12,7 @@ module TigerBeetle
       code: 0,
       timestamp_min: 0,
       timestamp_max: 0,
-      limit: 0,
+      limit:,
       flags: []
     )
       super(
