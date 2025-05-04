@@ -4,17 +4,16 @@ require 'tigerbeetle/converters'
 require 'tigerbeetle/account'
 require 'tigerbeetle/account_balance'
 require 'tigerbeetle/account_filter'
+require 'tigerbeetle/atomic_counter'
 require 'tigerbeetle/query_filter'
 require 'tigerbeetle/request'
 require 'tigerbeetle/transfer'
 
 module TigerBeetle
   class Client
-    # TODO: Make this counter atomic
-    @counter = 0
-
     def self.next_id
-      @counter += 1
+      @counter ||= AtomicCounter.new
+      @counter.increment
     end
 
     def initialize(cluster_id = 0, address = '3000')
