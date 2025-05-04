@@ -1,6 +1,8 @@
 # Ruby Client for TigerBeetle
 
+[![Gem](https://badge.fury.io/rb/tigerbeetle.svg)](https://rubygems.org/gems/tigerbeetle)
 [![CI](https://github.com/antstorm/tigerbeetle-ruby/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/antstorm/tigerbeetle-ruby/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/antstorm/tigerbeetle-ruby.svg)](https://opensource.org/licenses/apache-2-0)
 
 Are you looking to integrate [Tigebeetle](https://tigerbeetle.com/) into your Ruby (or Rails) stack?
 You've come to the right place!
