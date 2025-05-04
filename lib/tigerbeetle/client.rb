@@ -131,6 +131,7 @@ module TigerBeetle
 
     def deinit
       return unless client
+      return unless inflight_requests.empty?
 
       TBClient.tb_client_deinit(client)
       @client = nil
@@ -155,6 +156,7 @@ module TigerBeetle
       request = inflight_requests[request_id]
       result = deserialize(result_ptr, request.converter, result_len)
       request.block.call(result)
+      inflight_requests.delete(request_id)
     end
 
     def submit_request(operation, request, request_converter, response_converter, &block)
