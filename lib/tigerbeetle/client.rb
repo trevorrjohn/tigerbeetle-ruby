@@ -5,6 +5,7 @@ require 'tigerbeetle/account'
 require 'tigerbeetle/account_balance'
 require 'tigerbeetle/account_filter'
 require 'tigerbeetle/atomic_counter'
+require 'tigerbeetle/error'
 require 'tigerbeetle/query_filter'
 require 'tigerbeetle/request'
 require 'tigerbeetle/transfer'
@@ -34,7 +35,7 @@ module TigerBeetle
         @client_id,
         &@callback
       )
-      raise "Error while initializing client: #{status}" unless status == :SUCCESS
+      raise ClientError, "Unable to initialize native client: #{status}" unless status == :SUCCESS
 
       # Make sure to deinitialize all clients when the process terminates
       at_exit { deinit }
@@ -45,7 +46,7 @@ module TigerBeetle
       @log_callback = @logger ? Proc.new { |*args| log_callback(*args) } : nil
 
       status = TBClient.tb_client_register_log_callback(@log_callback, true)
-      raise "Error registering a logger: #{status}" unless status == :SUCCESS
+      raise ClientError, "Unable to register logger: #{status}" unless status == :SUCCESS
     end
 
     def create_accounts(*accounts, &block)
@@ -157,7 +158,7 @@ module TigerBeetle
     end
 
     def submit_request(operation, request, request_converter, response_converter, &block)
-      raise 'Client is not connected' unless client
+      raise ClientError, 'Client is not connected' unless client
 
       request_id = self.class.next_id
       user_data_ptr = FFI::MemoryPointer.new(:uint64, 1)
@@ -182,7 +183,7 @@ module TigerBeetle
       end
 
       status = TBClient.tb_client_submit(client, packet)
-      raise "Unable to submit request: #{status}" unless status == :OK
+      raise ClientError, "Unable to submit request: #{status}" unless status == :OK
 
       # block until the client return a response
       queue.pop unless block
