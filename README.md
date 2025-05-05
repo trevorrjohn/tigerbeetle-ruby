@@ -76,6 +76,29 @@ client.create_accounts(
 *More on how to approach this — https://docs.tigerbeetle.com/coding/data-modeling/#id.*
 
 
+## Async
+
+All the lower level calls executed by the client are non-blocking. However, since async calls are
+much less common in Ruby, these are made blocking by default. In order to use the client
+asynchronously all you need to do is provide your own callback to any method on the client:
+
+```ruby
+# default blocking call
+result = client.lookup_accounts(100)
+result # [#<struct TigerBeetle::Account id=100, ... >]
+
+# async non-blocking call
+client.lookup_accounts(100) do |result|
+  result # [#<struct TigerBeetle::Account id=100, ... >]
+end
+```
+
+*In the example above the first call will block until TigerBeetle responds and the return value of
+the call will contain the result. The second call however will return `nil` straight away (and keep
+executing your code) while calling the provided block only once TigerBeetle has responded, passing
+in the result as an argument to the block.*
+
+
 ## Contributing
 
 We'd love your help building the TigerBeetle Ruby gem.
